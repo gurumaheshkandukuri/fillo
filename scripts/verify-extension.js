@@ -117,21 +117,32 @@ if (manifest) {
     }
   }
 
-  // 8. Verify minimum permissions
+  // 8. Verify minimum permissions & content scripts (Milestone 3A)
   const permissions = manifest.permissions || [];
   assert(
-    !permissions.includes('<all_urls>') && !permissions.includes('*://*/*'),
-    'Minimum access respected: no broad permissions in manifest permissions array'
+    permissions.length === 1 && permissions[0] === 'storage',
+    'Minimum permissions respected: only "storage" is requested in permissions'
   );
   assert(
     !manifest.host_permissions || manifest.host_permissions.length === 0,
-    'Minimum access respected: zero host permissions in M1 manifest'
+    'Zero redundant host_permissions declared'
   );
+
+  // 9. Verify content_scripts registration
+  assert(
+    Array.isArray(manifest.content_scripts) && manifest.content_scripts.length > 0,
+    'content_scripts is configured in manifest'
+  );
+  if (manifest.content_scripts && manifest.content_scripts[0]) {
+    const cs = manifest.content_scripts[0];
+    assert(cs.matches && cs.matches.includes('<all_urls>'), 'content_scripts matches "<all_urls>"');
+    assert(cs.js && cs.js.includes('content/content.js'), 'content_scripts references "content/content.js"');
+  }
 }
 
-// 9. Verify content script skeleton exists in dist/content/content.js
+// 10. Verify content script bundle exists in dist/content/content.js
 const contentScriptPath = path.join(distDir, 'content/content.js');
-assert(fs.existsSync(contentScriptPath), 'Content script skeleton bundle exists at dist/content/content.js');
+assert(fs.existsSync(contentScriptPath), 'Content script bundle exists at dist/content/content.js');
 
 console.log('----------------------------------------------------');
 if (errorCount === 0) {

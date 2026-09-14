@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FILLO Test Form - Milestone 4 Safe Autofill Engine</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      max-width: 760px;
+      margin: 32px auto;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+    header {
+      margin-bottom: 24px;
+    }
+    h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #0f172a;
+      margin: 0 0 6px 0;
+    }
+    p.subtitle {
+      color: #64748b;
+      margin: 0 0 16px 0;
+      font-size: 14px;
+    }
+    .banner {
+      background: #eff6ff;
+      border: 1px solid #bfdbfe;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #1e40af;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1e293b;
+      margin: 0 0 16px 0;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #f1f5f9;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 9999px;
+      text-transform: uppercase;
+      letter-spacing: 0.03em;
+    }
+    .badge-fill {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge-safety {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .badge-state {
+      background: #fef3c7;
+      color: #92400e;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    .form-group.full-width {
+      grid-column: 1 / -1;
+    }
+    label {
+      display: block;
+      font-weight: 600;
+      font-size: 13px;
+      margin-bottom: 5px;
+      color: #334155;
+    }
+    input, textarea, select {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 9px 12px;
+      border-radius: 6px;
+      border: 1px solid #cbd5e1;
+      font-size: 14px;
+      font-family: inherit;
+      background: #ffffff;
+      transition: border-color 0.15s, box-shadow 0.15s;
+    }
+    input:focus, textarea:focus, select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+    }
+    input:disabled, input:read-only {
+      background-color: #f1f5f9;
+      color: #64748b;
+      cursor: not-allowed;
+    }
+    .helper-text {
+      font-size: 11px;
+      color: #64748b;
+      margin-top: 4px;
+    }
+    .btn {
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      padding: 9px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border-radius: 6px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .btn:hover {
+      background-color: #4338ca;
+    }
+    .btn-secondary {
+      background-color: #f1f5f9;
+      color: #334155;
+      border: 1px solid #cbd5e1;
+    }
+    .btn-secondary:hover {
+      background-color: #e2e8f0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FILLO Test Form (Milestone 4: Safe Autofill)</h1>
+    <p class="subtitle">
+      Comprehensive test harness verifying safe local autofill, safety gate refusal, input event dispatching, and zero-overwriting rules.
+    </p>
+    <div class="banner">
+      💡 <strong>Instructions for Testing in Chrome:</strong><br />
+      1. Open the FILLO popup from your Chrome toolbar and save a profile.<br />
+      2. Reload this page. Observe eligible fields automatically populate with your local data.<br />
+      3. Notice that negative tests (Company Name, Emergency Contact, Username, Name) are safely refused.<br />
+      4. Inspect the DevTools Console: Notice zero profile values appear in logs.
+    </div>
+  </header>
+
+  <form id="job-application-form" onsubmit="event.preventDefault();">
+    <!-- SECTION 1: CANDIDATE PROFILE FIELDS (Eligible for Safe Autofill) -->
+    <div class="card">
+      <div class="card-title">
+        <span>1. Candidate Profile Fields</span>
+        <span class="badge badge-fill">Expected: Autofilled (High Confidence)</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="full-name">Full Name</label>
+          <input type="text" id="full-name" name="candidate_full_name" autocomplete="name" />
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="candidate_email" autocomplete="email" />
+        </div>
+
+        <div class="form-group">
+          <label for="phone">Phone Number</label>
+          <input type="tel" id="phone" name="phone_number" autocomplete="tel" />
+        </div>
+
+        <div class="form-group">
+          <label for="city-location">City / Location</label>
+          <input type="text" id="city-location" name="city_location" />
+        </div>
+
+        <div class="form-group">
+          <label for="college">University / College</label>
+          <input type="text" id="college" name="college_name" />
+        </div>
+
+        <div class="form-group">
+          <label for="degree">Degree Level</label>
+          <select id="degree" name="degree_level">
+            <option value="">Select degree...</option>
+            <option value="Bachelor's Degree">Bachelor's Degree</option>
+            <option value="Master's Degree">Master's Degree</option>
+            <option value="Ph.D.">Ph.D.</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="branch">Major / Branch of Study</label>
+          <input type="text" id="branch" name="major_branch" />
+        </div>
+
+        <div class="form-group">
+          <label for="cgpa">Cumulative GPA (CGPA)</label>
+          <input type="number" id="cgpa" name="cgpa" step="0.01" />
+        </div>
+
+        <div class="form-group">
+          <label for="grad-year">Graduation Year</label>
+          <input type="number" id="grad-year" name="graduation_year" min="1950" max="2100" />
+        </div>
+
+        <div class="form-group">
+          <label for="github-profile">GitHub Profile URL</label>
+          <input type="url" id="github-profile" name="github_url" />
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin-profile">LinkedIn Profile URL</label>
+          <input type="url" id="linkedin-profile" name="linkedin_url" />
+        </div>
+
+        <div class="form-group">
+          <label for="portfolio-website">Portfolio Website</label>
+          <input type="url" id="portfolio-website" name="portfolio_url" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="technical-skills">Technical Skills</label>
+          <textarea id="technical-skills" name="technical_skills" rows="3" placeholder="Key programming skills"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: NEGATIVE & AMBIGUITY TESTS (Must NOT be Autofilled) -->
+    <div class="card">
+      <div class="card-title">
+        <span>2. Negative & Ambiguity Safeguards</span>
+        <span class="badge badge-safety">Expected: Refused / Untouched</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="company-name">Company Name</label>
+          <input type="text" id="company-name" name="company_name" placeholder="Previous employer name" />
+          <div class="helper-text">Should NOT map to candidate's name.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="emergency-contact">Emergency Contact Phone</label>
+          <input type="tel" id="emergency-contact" name="emergency_contact" placeholder="Emergency contact phone" />
+          <div class="helper-text">Should NOT map to candidate's personal phone.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="username">Account Username</label>
+          <input type="text" id="username" name="username" placeholder="Choose a username" />
+          <div class="helper-text">Should NOT fill with candidate's full name.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="generic-name">Name (Ambiguous unqualified)</label>
+          <input type="text" id="generic-name" name="name" placeholder="Unqualified name field" />
+          <div class="helper-text">Ambiguous: Could mean first, last, or full name. Refused.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: CONTROL STATE SAFEGUARDS (Existing Value, Disabled, Readonly, Password, Hidden) -->
+    <div class="card">
+      <div class="card-title">
+        <span>3. Control State Safeguards</span>
+        <span class="badge badge-state">Expected: Refused / Untouched</span>
+      </div>
+
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="existing-email">Email (Already Contains User Value)</label>
+          <input type="email" id="existing-email" name="applicant_email" value="prefilled.user@custom.com" />
+          <div class="helper-text">Never overwrites pre-existing data.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="disabled-name">Full Name (Disabled)</label>
+          <input type="text" id="disabled-name" name="disabled_full_name" value="System Locked Name" disabled />
+          <div class="helper-text">Disabled fields are strictly untouched.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="readonly-phone">Phone Number (Readonly)</label>
+          <input type="tel" id="readonly-phone" name="readonly_phone" value="+1 800-000-0000" readonly />
+          <div class="helper-text">Readonly fields are strictly untouched.</div>
+        </div>
+
+        <div class="form-group">
+          <label for="account-password">Account Password</label>
+          <input type="password" id="account-password" name="account_password" value="secret_pwd" />
+          <div class="helper-text">Password fields are strictly excluded.</div>
+        </div>
+      </div>
+
+      <!-- Hidden field -->
+      <input type="hidden" name="csrf_token" value="sec_token_999" />
+    </div>
+
+    <!-- Actions -->
+    <div style="display: flex; gap: 12px; margin-bottom: 24px;">
+      <input type="submit" value="Submit Form (Safe Test: Will Prevent Default)" class="btn" />
+      <input type="reset" value="Reset Form Values" class="btn btn-secondary" />
+    </div>
+  </form>
+
+  <!-- Dynamic Field Insertion Card -->
+  <div class="card">
+    <div class="card-title">
+      <span>4. Dynamic Field Insertion (SPA / React Simulation)</span>
+    </div>
+    <p style="font-size: 13px; color: #64748b; margin-top: 0;">
+      Click below to insert a new field into the DOM. FILLO's MutationObserver should detect and safely autofill it without re-filling existing controls.
+    </p>
+    <button type="button" id="btn-add-dynamic" class="btn btn-secondary">Add Dynamic GitHub Field</button>
+    <div id="dynamic-container" style="margin-top: 16px;"></div>
+  </div>
+
+  <script>
+    let dynamicCount = 0;
+    document.getElementById('btn-add-dynamic').addEventListener('click', () => {
+      dynamicCount++;
+      const container = document.getElementById('dynamic-container');
+      const div = document.createElement('div');
+      div.className = 'form-group';
+      div.innerHTML = `
+        <label for="dynamic-github-${dynamicCount}">Dynamic GitHub Field #${dynamicCount}</label>
+        <input type="url" id="dynamic-github-${dynamicCount}" name="dynamic_github_profile_${dynamicCount}" />
+      `;
+      container.appendChild(div);
+    });
+  </script>
+</body>
+</html>
