@@ -1,0 +1,19 @@
+{
+  "name": "fillo",
+  "version": "0.1.0",
+  "description": "Privacy-first Chrome browser extension to intelligently autofill repetitive web forms using a local profile.",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "generate-icons": "node scripts/generate-icons.js",
+    "build": "node scripts/generate-icons.js && tsc --noEmit && vite build && node scripts/verify-extension.js",
+    "dev": "vite build --watch",
+    "verify": "node scripts/verify-extension.js"
+  },
+  "devDependencies": {
+    "@types/chrome": "^0.0.308",
+    "@types/node": "^26.5.1",
+    "typescript": "^5.8.2",
+    "vite": "^6.2.0"
+  }
+}
