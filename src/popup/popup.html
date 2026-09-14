@@ -3,31 +3,167 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>FILLO</title>
+  <title>FILLO - Profile</title>
   <link rel="stylesheet" href="./popup.css" />
 </head>
 <body>
-  <div class="card">
-    <div class="header">
-      <div class="brand">
-        <div class="logo-mark">F</div>
-        <h1 class="brand-title">FILLO</h1>
+  <div class="app-container">
+    <!-- Header -->
+    <header class="header">
+      <div class="brand-row">
+        <div class="brand">
+          <div class="logo-mark">F</div>
+          <div>
+            <h1 class="brand-title">FILLO</h1>
+            <p class="tagline">Fill once. Apply anywhere.</p>
+          </div>
+        </div>
+        <span class="privacy-pill">Local Only</span>
       </div>
-      <span class="version-badge">v0.1.0</span>
-    </div>
 
-    <p class="tagline">Fill once. Apply anywhere.</p>
+      <!-- Global Notification Banner -->
+      <div id="status-banner" class="status-banner hidden" role="status" aria-live="polite"></div>
+    </header>
 
-    <div class="divider"></div>
+    <!-- Main Scrollable Form -->
+    <main class="form-container">
+      <form id="profile-form" novalidate>
+        <!-- 1. Personal Information -->
+        <fieldset class="section-card">
+          <legend class="section-title">Personal Information</legend>
+          
+          <div class="field-group">
+            <label for="fullName">Full Name</label>
+            <input type="text" id="fullName" name="fullName" placeholder="e.g. Alex Morgan" autocomplete="name" />
+            <span class="field-error" id="error-personal-fullName"></span>
+          </div>
 
-    <div class="status-row">
-      <div class="status-indicator">
-        <span class="status-dot"></span>
-        <span class="status-label">Local profile ready</span>
+          <div class="two-col">
+            <div class="field-group">
+              <label for="firstName">First Name</label>
+              <input type="text" id="firstName" name="firstName" placeholder="Alex" autocomplete="given-name" />
+              <span class="field-error" id="error-personal-firstName"></span>
+            </div>
+            <div class="field-group">
+              <label for="lastName">Last Name</label>
+              <input type="text" id="lastName" name="lastName" placeholder="Morgan" autocomplete="family-name" />
+              <span class="field-error" id="error-personal-lastName"></span>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="email">Email</label>
+            <input type="email" id="email" name="email" placeholder="alex@example.com" autocomplete="email" />
+            <span class="field-error" id="error-personal-email"></span>
+          </div>
+
+          <div class="field-group">
+            <label for="phone">Phone Number</label>
+            <input type="tel" id="phone" name="phone" placeholder="+1 (555) 000-1234" autocomplete="tel" />
+            <span class="field-error" id="error-personal-phone"></span>
+          </div>
+
+          <div class="field-group">
+            <label for="location">Location</label>
+            <input type="text" id="location" name="location" placeholder="San Francisco, CA" autocomplete="address-level2" />
+            <span class="field-error" id="error-personal-location"></span>
+          </div>
+        </fieldset>
+
+        <!-- 2. Education -->
+        <fieldset class="section-card">
+          <legend class="section-title">Education</legend>
+
+          <div class="field-group">
+            <label for="college">College / University</label>
+            <input type="text" id="college" name="college" placeholder="Stanford University" />
+            <span class="field-error" id="error-education-college"></span>
+          </div>
+
+          <div class="two-col">
+            <div class="field-group">
+              <label for="degree">Degree</label>
+              <input type="text" id="degree" name="degree" placeholder="Bachelor of Science" />
+              <span class="field-error" id="error-education-degree"></span>
+            </div>
+            <div class="field-group">
+              <label for="branch">Branch / Major</label>
+              <input type="text" id="branch" name="branch" placeholder="Computer Science" />
+              <span class="field-error" id="error-education-branch"></span>
+            </div>
+          </div>
+
+          <div class="two-col">
+            <div class="field-group">
+              <label for="cgpa">CGPA / GPA</label>
+              <input type="number" id="cgpa" name="cgpa" step="0.01" min="0" max="10" placeholder="3.85 or 9.2" />
+              <span class="field-error" id="error-education-cgpa"></span>
+            </div>
+            <div class="field-group">
+              <label for="graduationYear">Graduation Year</label>
+              <input type="number" id="graduationYear" name="graduationYear" min="1950" max="2100" placeholder="2025" />
+              <span class="field-error" id="error-education-graduationYear"></span>
+            </div>
+          </div>
+        </fieldset>
+
+        <!-- 3. Online Profiles -->
+        <fieldset class="section-card">
+          <legend class="section-title">Online Profiles</legend>
+
+          <div class="field-group">
+            <label for="github">GitHub</label>
+            <input type="url" id="github" name="github" placeholder="https://github.com/username" />
+            <span class="field-error" id="error-online-github"></span>
+          </div>
+
+          <div class="field-group">
+            <label for="linkedin">LinkedIn</label>
+            <input type="url" id="linkedin" name="linkedin" placeholder="https://linkedin.com/in/username" />
+            <span class="field-error" id="error-online-linkedin"></span>
+          </div>
+
+          <div class="field-group">
+            <label for="portfolio">Portfolio / Website</label>
+            <input type="url" id="portfolio" name="portfolio" placeholder="https://alexmorgan.dev" />
+            <span class="field-error" id="error-online-portfolio"></span>
+          </div>
+        </fieldset>
+
+        <!-- 4. Skills -->
+        <fieldset class="section-card">
+          <legend class="section-title">Skills</legend>
+
+          <div class="field-group">
+            <label for="skills">Skills <span class="label-hint">(comma-separated)</span></label>
+            <textarea id="skills" name="skills" rows="3" placeholder="TypeScript, React, Python, SQL, Docker"></textarea>
+            <span class="field-error" id="error-skills"></span>
+          </div>
+        </fieldset>
+
+        <!-- Action Buttons -->
+        <div class="action-footer">
+          <button type="submit" id="btn-save" class="btn btn-primary">Save Profile</button>
+          <button type="button" id="btn-clear" class="btn btn-secondary">Clear Profile</button>
+        </div>
+      </form>
+    </main>
+
+    <!-- Confirmation Modal for Clear Profile -->
+    <div id="modal-overlay" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-dialog">
+        <h3 id="modal-title" class="modal-title">Clear saved profile?</h3>
+        <p class="modal-desc">
+          This will permanently remove all locally stored FILLO profile information from your device.
+        </p>
+        <div class="modal-actions">
+          <button type="button" id="btn-modal-cancel" class="btn btn-secondary">Cancel</button>
+          <button type="button" id="btn-modal-confirm" class="btn btn-danger">Yes, Clear Profile</button>
+        </div>
       </div>
-      <span class="privacy-pill">Privacy-first</span>
     </div>
   </div>
+
   <script type="module" src="./popup.ts"></script>
 </body>
 </html>

@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "generate-icons": "node scripts/generate-icons.js",
-    "build": "node scripts/generate-icons.js && tsc --noEmit && vite build && node scripts/verify-extension.js",
+    "test": "node --experimental-strip-types scripts/test-profile.js",
+    "build": "node scripts/generate-icons.js && node --experimental-strip-types scripts/test-profile.js && tsc --noEmit && vite build && node scripts/verify-extension.js",
     "dev": "vite build --watch",
     "verify": "node scripts/verify-extension.js"
   },
