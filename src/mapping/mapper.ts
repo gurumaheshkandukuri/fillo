@@ -41,7 +41,13 @@ export function mapField(metadata: FieldMetadata): FieldMappingResult {
   const nameTokens = tokenize(metadata.nameNormalized);
   const combinedTokens = new Set([...labelTokens, ...nameTokens]);
 
+  const isPersonNameCandidate =
+    topCandidate.profileField === 'personal.fullName' ||
+    topCandidate.profileField === 'personal.firstName' ||
+    topCandidate.profileField === 'personal.lastName';
+
   const isGenericName =
+    isPersonNameCandidate &&
     combinedTokens.has('name') &&
     !combinedTokens.has('full') &&
     !combinedTokens.has('fullname') &&

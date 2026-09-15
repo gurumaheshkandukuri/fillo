@@ -1,27 +1,32 @@
 /**
- * FILLO Content Script (Milestone 4: Safe Autofill Engine)
- * Coordinates field detection, semantic mapping, and safe profile autofill.
- * Strictly adheres to privacy-first, local-first safety rules.
+ * FILLO Content Script (Milestone 5: Real-World Form Compatibility & Autofill UX)
+ * Coordinates field detection, semantic mapping, and user-triggered profile autofill.
+ * Strictly adheres to privacy-first, local-first safety rules:
+ * - NO automatic autofill on page load or mutation.
+ * - DOM value modification occurs ONLY upon user confirmation ("Fill with FILLO").
+ * - Zero profile values leaked in logs or messages.
  */
 
 import { FieldDetector } from './field-detector.ts';
 import { DynamicFormObserver } from './mutation-observer.ts';
 import type { DetectedField } from '../types/field.ts';
 import type { Profile } from '../types/profile.ts';
+import type { AutofillMessage } from '../types/autofill.ts';
 import { mapField } from '../mapping/mapper.ts';
 import { getProfile, STORAGE_KEY } from '../storage/profile-storage.ts';
-import { autofillField } from '../autofill/autofill-engine.ts';
+import { AutofillController } from '../autofill/autofill-controller.ts';
 
 let currentProfile: Profile | null = null;
 let detector: FieldDetector;
 let observer: DynamicFormObserver;
+let controller: AutofillController;
 
 /**
- * Processes detected form fields, evaluates semantic mappings, and safely autofills
- * eligible fields when a valid local profile is present.
- * NEVER logs personal profile values or filled values to console.
+ * Logs detected fields and semantic mappings for debugging.
+ * Does NOT modify DOM values.
+ * NEVER logs personal profile values or filled values.
  */
-function processDetectedFields(
+function logDetectedFields(
   fields: DetectedField[],
   context: 'Initial scan' | 'Dynamic update'
 ): void {
@@ -36,7 +41,6 @@ function processDetectedFields(
     const meta = field.metadata;
     const mapping = mapField(meta);
 
-    // 1. Safe detection and mapping debug log
     console.log(
       `  [#${idx + 1}] <${meta.tagName}> type="${meta.type}" name="${meta.name || '(none)'}" label="${
         meta.labelText || '(none)'
@@ -44,32 +48,21 @@ function processDetectedFields(
         mapping.confidence * 100
       ).toFixed(0)}%)`
     );
-
-    // 2. Safe autofill attempt if profile is available
-    if (currentProfile) {
-      const autofillResult = autofillField(field, mapping, currentProfile);
-
-      if (autofillResult.status === 'filled') {
-        // Privacy safe: log only field key, never the value
-        console.log(`[FILLO] Autofilled: ${autofillResult.profileField} (high confidence)`);
-      } else {
-        console.log(`[FILLO] Skipped field: ${autofillResult.reason}`);
-      }
-    }
   });
 }
 
 /**
- * Initializes field detection and safe autofill lifecycle.
+ * Initializes field detection, dynamic observer, and messaging handlers.
  */
 async function init(): Promise<void> {
   detector = new FieldDetector();
+  controller = new AutofillController(detector);
 
   // Load local profile from chrome.storage.local
   try {
     currentProfile = await getProfile();
     if (!currentProfile) {
-      console.log('[FILLO] No local profile found. Autofill inactive.');
+      console.log('[FILLO] No local profile found.');
     } else {
       console.log('[FILLO] Local profile loaded successfully.');
     }
@@ -77,13 +70,13 @@ async function init(): Promise<void> {
     console.warn('[FILLO] Could not load local profile.');
   }
 
-  // 1. Initial scan on document ready
+  // 1. Initial scan on document ready (inspection only — no DOM modification)
   const initialFields = detector.scan();
-  processDetectedFields(initialFields, 'Initial scan');
+  logDetectedFields(initialFields, 'Initial scan');
 
   // 2. Setup dynamic form observer for client-rendered SPA / React additions
   observer = new DynamicFormObserver(detector, (newlyAddedFields) => {
-    processDetectedFields(newlyAddedFields, 'Dynamic update');
+    logDetectedFields(newlyAddedFields, 'Dynamic update');
   });
 
   if (document.body) {
@@ -100,11 +93,28 @@ async function init(): Promise<void> {
       if (areaName === 'local' && changes[STORAGE_KEY]) {
         currentProfile = (changes[STORAGE_KEY].newValue as Profile) || null;
         if (currentProfile) {
-          console.log('[FILLO] Local profile updated. Scanning fields...');
-          const currentFields = detector.scan();
-          processDetectedFields(currentFields, 'Dynamic update');
+          console.log('[FILLO] Local profile updated.');
         }
       }
+    });
+  }
+
+  // 4. Listen for user actions and status requests from popup
+  if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((message: AutofillMessage, _sender, sendResponse) => {
+      if (message.type === 'GET_AUTOFILL_STATUS') {
+        const summary = controller.getStatus(currentProfile);
+        sendResponse(summary);
+        return false;
+      }
+
+      if (message.type === 'EXECUTE_AUTOFILL') {
+        const result = controller.executeAutofill(currentProfile);
+        sendResponse(result);
+        return false;
+      }
+
+      return false;
     });
   }
 }

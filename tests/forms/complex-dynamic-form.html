@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FILLO Test - Complex Dynamic Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      max-width: 700px;
+      margin: 32px auto;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+    p.subtitle {
+      color: #64748b;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+    input, select {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    .step-box {
+      background-color: #f1f5f9;
+      border-radius: 6px;
+      padding: 16px;
+      margin-top: 16px;
+      border-left: 4px solid #6366f1;
+    }
+    .step-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #334155;
+      margin-bottom: 10px;
+    }
+    .btn {
+      padding: 8px 14px;
+      background-color: #4f46e5;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+    .btn:hover {
+      background-color: #4338ca;
+    }
+    .btn-secondary {
+      background-color: #0f172a;
+    }
+    .btn-secondary:hover {
+      background-color: #1e293b;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Multi-Step Progressive Dynamic Form</h1>
+    <p class="subtitle">
+      Verifying that dynamically inserted form fields are automatically detected by MutationObserver and ready for user-triggered fill.
+    </p>
+
+    <form id="dynamic-form" onsubmit="event.preventDefault();">
+      <!-- Step 1: Initial Fields (Always present on load) -->
+      <div class="step-box">
+        <div class="step-title">Step 1: Contact Information (Loaded Initially)</div>
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" name="candidate_full_name" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email Address</label>
+          <input type="email" id="email" name="email_address" />
+        </div>
+      </div>
+
+      <!-- Step 2: Dynamically Inserted Education Section -->
+      <div id="education-step-container"></div>
+      <button type="button" id="btn-add-education" class="btn">
+        + Load Education Details (Dynamic)
+      </button>
+
+      <!-- Step 3: Dynamically Inserted Online Section -->
+      <div id="online-step-container"></div>
+      <button type="button" id="btn-add-online" class="btn btn-secondary" style="display: none;">
+        + Load Online Profiles (Dynamic)
+      </button>
+
+      <div style="margin-top: 24px;">
+        <button type="submit" class="btn" style="background-color: #10b981;">
+          Submit Dynamic Application
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    const btnEdu = document.getElementById('btn-add-education');
+    const btnOnline = document.getElementById('btn-add-online');
+    const eduContainer = document.getElementById('education-step-container');
+    const onlineContainer = document.getElementById('online-step-container');
+
+    btnEdu.addEventListener('click', () => {
+      eduContainer.innerHTML = `
+        <div class="step-box">
+          <div class="step-title">Step 2: Education Details (Dynamically Inserted)</div>
+          <div class="form-group">
+            <label for="college">University / College</label>
+            <input type="text" id="college" name="college_name" />
+          </div>
+          <div class="form-group">
+            <label for="degree">Degree</label>
+            <select id="degree" name="degree">
+              <option value="">Select degree...</option>
+              <option value="Bachelor of Science">Bachelor of Science</option>
+              <option value="Bachelor's Degree">Bachelor's Degree</option>
+              <option value="Master of Science">Master of Science</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="branch">Branch / Major</label>
+            <input type="text" id="branch" name="branch" />
+          </div>
+        </div>
+      `;
+      btnEdu.style.display = 'none';
+      btnOnline.style.display = 'inline-block';
+    });
+
+    btnOnline.addEventListener('click', () => {
+      onlineContainer.innerHTML = `
+        <div class="step-box">
+          <div class="step-title">Step 3: Online Information (Dynamically Inserted)</div>
+          <div class="form-group">
+            <label for="github">GitHub Profile</label>
+            <input type="url" id="github" name="github_url" />
+          </div>
+          <div class="form-group">
+            <label for="linkedin">LinkedIn Profile</label>
+            <input type="url" id="linkedin" name="linkedin_url" />
+          </div>
+          <div class="form-group">
+            <label for="portfolio">Portfolio</label>
+            <input type="url" id="portfolio" name="portfolio_url" />
+          </div>
+        </div>
+      `;
+      btnOnline.style.display = 'none';
+    });
+  </script>
+</body>
+</html>

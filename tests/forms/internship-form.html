@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FILLO Test - Summer Internship Portal</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      max-width: 700px;
+      margin: 32px auto;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      margin-bottom: 20px;
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+    p.subtitle {
+      color: #64748b;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .full-width {
+      grid-column: 1 / -1;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+    input, textarea {
+      padding: 8px 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    input:focus, textarea:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    .negative-box {
+      border: 1px dashed #f87171;
+      background: #fff5f5;
+      padding: 16px;
+      border-radius: 8px;
+      margin-top: 16px;
+    }
+    .negative-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #991b1b;
+      margin-bottom: 12px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Summer Internship Application 2026</h1>
+    <p class="subtitle">
+      Verifying candidate profile autofill alongside recruiter and previous company fields.
+    </p>
+
+    <form id="internship-form" onsubmit="event.preventDefault();">
+      <!-- 1. Candidate Info (Eligible) -->
+      <div class="form-grid">
+        <div class="form-group full-width">
+          <label for="candidate_name">Candidate Name</label>
+          <input type="text" id="candidate_name" name="candidate_name" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="university">University</label>
+          <input type="text" id="university" name="university" />
+        </div>
+
+        <div class="form-group">
+          <label for="major">Major</label>
+          <input type="text" id="major" name="major" />
+        </div>
+
+        <div class="form-group">
+          <label for="grad_date">Graduation Date (Year)</label>
+          <input type="number" id="grad_date" name="grad_year" min="1950" max="2100" />
+        </div>
+
+        <div class="form-group">
+          <label for="github_url">GitHub URL</label>
+          <input type="url" id="github_url" name="github_url" />
+        </div>
+
+        <div class="form-group">
+          <label for="linkedin_url">LinkedIn URL</label>
+          <input type="url" id="linkedin_url" name="linkedin_url" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="personal_website">Personal Website</label>
+          <input type="url" id="personal_website" name="website" />
+        </div>
+
+        <div class="form-group full-width">
+          <label for="skills">Skills</label>
+          <textarea id="skills" name="skills" rows="3"></textarea>
+        </div>
+      </div>
+
+      <!-- 2. Recruiter & Company Fields (Negative Context - Must NOT fill) -->
+      <div class="negative-box">
+        <div class="negative-title">Recruiter & Company Information (Must NOT be filled with candidate data)</div>
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="prev_company">Previous Company</label>
+            <input type="text" id="prev_company" name="previous_company" />
+          </div>
+
+          <div class="form-group">
+            <label for="comp_website">Company Website</label>
+            <input type="url" id="comp_website" name="company_website" />
+          </div>
+
+          <div class="form-group">
+            <label for="recruiter_name">Recruiter Name</label>
+            <input type="text" id="recruiter_name" name="recruiter_name" />
+          </div>
+
+          <div class="form-group">
+            <label for="recruiter_phone">Recruiter Phone</label>
+            <input type="tel" id="recruiter_phone" name="recruiter_phone" />
+          </div>
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 18px; background: #4f46e5; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+          Submit Application
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>

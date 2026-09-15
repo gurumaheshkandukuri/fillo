@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FILLO Test - Scholarship Application Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: #f8fafc;
+      color: #0f172a;
+      max-width: 680px;
+      margin: 32px auto;
+      padding: 0 20px;
+      line-height: 1.5;
+    }
+    .card {
+      background: #ffffff;
+      border: 1px solid #e2e8f0;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    h1 {
+      font-size: 22px;
+      margin-bottom: 6px;
+      color: #1e293b;
+    }
+    p.subtitle {
+      color: #64748b;
+      margin-bottom: 20px;
+      font-size: 14px;
+    }
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+    label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #334155;
+    }
+    input, select {
+      padding: 9px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    input:focus, select:focus {
+      outline: none;
+      border-color: #6366f1;
+      box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.2);
+    }
+    .ambiguous-section {
+      margin-top: 24px;
+      padding-top: 16px;
+      border-top: 1px dashed #cbd5e1;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      color: #b91c1c;
+      background: #fee2e2;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Academic Excellence Scholarship 2026</h1>
+    <p class="subtitle">Verifying flexible semantic mapping with alternate phrasing.</p>
+
+    <form id="scholarship-form" onsubmit="event.preventDefault();">
+      <!-- 1. Applicant's Full Name -->
+      <div class="form-group">
+        <label for="applicant_full_name">Applicant's Full Name</label>
+        <input type="text" id="applicant_full_name" name="applicant_full_name" />
+      </div>
+
+      <!-- 2. Contact Email -->
+      <div class="form-group">
+        <label for="contact_email">Contact Email</label>
+        <input type="email" id="contact_email" name="contact_email" />
+      </div>
+
+      <!-- 3. Phone -->
+      <div class="form-group">
+        <label for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" />
+      </div>
+
+      <!-- 4. Current City -->
+      <div class="form-group">
+        <label for="city">Current City</label>
+        <input type="text" id="city" name="city" />
+      </div>
+
+      <!-- 5. Institution -->
+      <div class="form-group">
+        <label for="institution">Institution</label>
+        <input type="text" id="institution" name="institution" />
+      </div>
+
+      <!-- 6. Program of Study (Degree) -->
+      <div class="form-group">
+        <label for="program_of_study">Program of Study</label>
+        <input type="text" id="program_of_study" name="program_of_study" placeholder="e.g. Bachelor of Science" />
+      </div>
+
+      <!-- 7. Field of Study (Branch) -->
+      <div class="form-group">
+        <label for="field_of_study">Field of Study</label>
+        <input type="text" id="field_of_study" name="field_of_study" placeholder="e.g. Computer Science" />
+      </div>
+
+      <!-- 8. Expected Completion Year -->
+      <div class="form-group">
+        <label for="completion_year">Expected Completion Year</label>
+        <input type="number" id="completion_year" name="completion_year" min="1950" max="2100" />
+      </div>
+
+      <!-- Ambiguous and negative guardian fields -->
+      <div class="ambiguous-section">
+        <div class="form-group">
+          <label for="guardian_name">Guardian / Parent Name <span class="badge">Refused</span></label>
+          <input type="text" id="guardian_name" name="guardian_name" />
+        </div>
+
+        <div class="form-group">
+          <label for="unqualified_name">Name <span class="badge">Ambiguous</span></label>
+          <input type="text" id="unqualified_name" name="name" />
+        </div>
+      </div>
+
+      <div style="margin-top: 20px;">
+        <button type="submit" style="padding: 10px 16px; background: #4f46e5; color: white; border: none; border-radius: 6px; font-weight: 600; cursor: pointer;">
+          Submit Application
+        </button>
+      </div>
+    </form>
+  </div>
+</body>
+</html>
