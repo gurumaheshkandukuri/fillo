@@ -43,7 +43,10 @@ export class AutofillController {
    * without modifying any DOM values.
    */
   public getStatus(profile: Profile | null, explicitFields?: DetectedField[]): AutofillStatusSummary {
-    const fields = explicitFields || this.detector.scan();
+    const rawFields = explicitFields || this.detector.scan();
+    const fields = rawFields.filter(
+      (f) => f.element && (typeof f.element.isConnected !== 'boolean' || f.element.isConnected)
+    );
     const evaluated: EvaluatedField[] = [];
 
     for (const field of fields) {
@@ -98,7 +101,10 @@ export class AutofillController {
     profile: Profile | null,
     explicitFields?: DetectedField[]
   ): AutofillExecutionSummary {
-    const fields = explicitFields || this.detector.scan();
+    const rawFields = explicitFields || this.detector.scan();
+    const fields = rawFields.filter(
+      (f) => f.element && (typeof f.element.isConnected !== 'boolean' || f.element.isConnected)
+    );
 
     if (!profile) {
       return {

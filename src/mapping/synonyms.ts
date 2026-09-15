@@ -153,6 +153,8 @@ export const FIELD_VOCABULARY: Record<ProfileFieldKey, FieldVocabulary> = {
       'recruiter',
       'referrer',
       'reference',
+      'alternate',
+      'secondary',
     ],
   },
 
@@ -191,6 +193,12 @@ export const FIELD_VOCABULARY: Record<ProfileFieldKey, FieldVocabulary> = {
       'alternate',
       'secondary',
       'reference',
+      'referee',
+      'confirm',
+      're-enter',
+      'reenter',
+      'verify',
+      'verification',
     ],
   },
 

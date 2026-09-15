@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FILLO Test — SPA Dynamic Route Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 30px 20px;
+    }
+    .card {
+      max-width: 620px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    .nav {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      border-bottom: 1px solid #e2e8f0;
+      padding-bottom: 12px;
+    }
+    .nav-btn {
+      padding: 8px 16px;
+      background: #f1f5f9;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 500;
+      font-size: 14px;
+    }
+    .nav-btn.active {
+      background: #2563eb;
+      color: #ffffff;
+      border-color: #2563eb;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #334155;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .notice {
+      background: #fef3c7;
+      border-left: 4px solid #f59e0b;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #92400e;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .route-display {
+      font-family: monospace;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Single Page Application (SPA) Dynamic Form</h1>
+    <div class="notice">
+      <strong>M6 Test Fixture:</strong> Switches views dynamically via <code>history.pushState</code>.
+      Replaces DOM nodes without a page reload to test stale reference pruning and route awareness.
+    </div>
+
+    <div class="route-display">Current Route: <strong id="route-label">/applicant-info</strong></div>
+
+    <div class="nav">
+      <button type="button" class="nav-btn active" id="btn-route-applicant">1. Applicant Info</button>
+      <button type="button" class="nav-btn" id="btn-route-education">2. Education Info</button>
+    </div>
+
+    <div id="spa-view-container">
+      <!-- Route 1 View -->
+      <div id="view-applicant">
+        <div class="form-group">
+          <label for="spa-fullname">Full Name</label>
+          <input type="text" id="spa-fullname" name="applicant_fullname" placeholder="Your full name">
+        </div>
+        <div class="form-group">
+          <label for="spa-email">Email Address</label>
+          <input type="email" id="spa-email" name="applicant_email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="spa-phone">Phone Number</label>
+          <input type="tel" id="spa-phone" name="applicant_phone" placeholder="+1 555-0199">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const btnApplicant = document.getElementById('btn-route-applicant');
+    const btnEducation = document.getElementById('btn-route-education');
+    const container = document.getElementById('spa-view-container');
+    const routeLabel = document.getElementById('route-label');
+
+    function renderApplicantView() {
+      routeLabel.textContent = '/applicant-info';
+      window.history.pushState({ route: 'applicant' }, '', '#/applicant-info');
+      btnApplicant.classList.add('active');
+      btnEducation.classList.remove('active');
+
+      container.innerHTML = `
+        <div id="view-applicant">
+          <div class="form-group">
+            <label for="spa-fullname">Full Name</label>
+            <input type="text" id="spa-fullname" name="applicant_fullname" placeholder="Your full name">
+          </div>
+          <div class="form-group">
+            <label for="spa-email">Email Address</label>
+            <input type="email" id="spa-email" name="applicant_email" placeholder="you@example.com">
+          </div>
+          <div class="form-group">
+            <label for="spa-phone">Phone Number</label>
+            <input type="tel" id="spa-phone" name="applicant_phone" placeholder="+1 555-0199">
+          </div>
+        </div>
+      `;
+    }
+
+    function renderEducationView() {
+      routeLabel.textContent = '/education-details';
+      window.history.pushState({ route: 'education' }, '', '#/education-details');
+      btnEducation.classList.add('active');
+      btnApplicant.classList.remove('active');
+
+      container.innerHTML = `
+        <div id="view-education">
+          <div class="form-group">
+            <label for="spa-college">College / University</label>
+            <input type="text" id="spa-college" name="college_name" placeholder="University name">
+          </div>
+          <div class="form-group">
+            <label for="spa-degree">Degree</label>
+            <input type="text" id="spa-degree" name="degree_title" placeholder="e.g. Bachelor of Technology">
+          </div>
+          <div class="form-group">
+            <label for="spa-grad-year">Graduation Year</label>
+            <input type="text" id="spa-grad-year" name="graduation_year" placeholder="e.g. 2024">
+          </div>
+        </div>
+      `;
+    }
+
+    btnApplicant.addEventListener('click', renderApplicantView);
+    btnEducation.addEventListener('click', renderEducationView);
+  </script>
+</body>
+</html>

@@ -26,12 +26,20 @@ export function checkAutofillSafety(
   mapping: FieldMappingResult,
   profile: Profile
 ): AutofillDecision {
-  // 1. Element existence check
+  // 1. Element existence & connection check
   if (!field || !field.element) {
     return { allowed: false, status: 'blocked', reason: 'element not found' };
   }
 
   const el = field.element;
+
+  if (typeof el.isConnected === 'boolean' && !el.isConnected) {
+    return { allowed: false, status: 'blocked', reason: 'disconnected element' };
+  }
+
+  if (Boolean((el as HTMLElement).isContentEditable)) {
+    return { allowed: false, status: 'skipped', reason: 'unsupported element type' };
+  }
 
   // 2. Disabled check
   const isDisabled =

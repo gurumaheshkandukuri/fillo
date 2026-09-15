@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FILLO Test — Autocomplete-Only Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 30px 20px;
+    }
+    .card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #1e293b;
+    }
+    .notice {
+      background: #f0fdf4;
+      border-left: 4px solid #22c55e;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #15803d;
+      margin-bottom: 24px;
+      border-radius: 4px;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Autocomplete-Driven Form</h1>
+    <div class="notice">
+      <strong>M6 Test Fixture:</strong> Minimal or generic labels, relying on standard HTML5 <code>autocomplete</code> tokens.
+      Includes a confirmation email field to test contradictory context safety.
+    </div>
+
+    <form id="autocomplete-form" onsubmit="event.preventDefault()">
+      <!-- Given name via autocomplete -->
+      <div class="form-group">
+        <input type="text" name="field_gn" autocomplete="given-name" placeholder="First / Given name">
+      </div>
+
+      <!-- Family name via autocomplete -->
+      <div class="form-group">
+        <input type="text" name="field_fn" autocomplete="family-name" placeholder="Last / Family name">
+      </div>
+
+      <!-- Email via autocomplete -->
+      <div class="form-group">
+        <input type="email" name="field_em" autocomplete="email" placeholder="Email address">
+      </div>
+
+      <!-- Contradictory confirmation email: has autocomplete="email" but is Confirm Email (must be skipped) -->
+      <div class="form-group">
+        <label style="display:block; font-size:12px; font-weight:600; margin-bottom:4px;">Confirm Email Address</label>
+        <input type="email" name="confirm_email" autocomplete="email" placeholder="Re-enter your email">
+      </div>
+
+      <!-- Tel via autocomplete -->
+      <div class="form-group">
+        <input type="tel" name="field_tel" autocomplete="tel" placeholder="Phone number">
+      </div>
+
+      <!-- URL via autocomplete -->
+      <div class="form-group">
+        <input type="url" name="field_site" autocomplete="url" placeholder="Personal portfolio website">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

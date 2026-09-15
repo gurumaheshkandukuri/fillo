@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FILLO Test — ARIA-Only Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 30px 20px;
+    }
+    .card {
+      max-width: 600px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #1e293b;
+    }
+    p {
+      color: #64748b;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    input:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    }
+    .notice {
+      background: #eff6ff;
+      border-left: 4px solid #3b82f6;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #1e40af;
+      margin-bottom: 24px;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>ARIA-Only Accessible Form</h1>
+    <div class="notice">
+      <strong>M6 Test Fixture:</strong> This form contains zero traditional &lt;label&gt; tags.
+      Fields are identified strictly through <code>aria-label</code> and <code>aria-labelledby</code>.
+    </div>
+
+    <form id="aria-form" onsubmit="event.preventDefault()">
+      <!-- ARIA-label: Candidate Full Name -->
+      <div class="form-group">
+        <input type="text" id="aria-fullname" aria-label="Candidate Full Name" placeholder="Full name according to ID">
+      </div>
+
+      <!-- ARIA-labelledby referencing heading -->
+      <div class="form-group">
+        <div id="email-heading" style="font-weight: 600; font-size: 14px; margin-bottom: 6px;">Email Address</div>
+        <input type="email" id="aria-email" aria-labelledby="email-heading" placeholder="name@example.com">
+      </div>
+
+      <!-- ARIA-label: Phone Number -->
+      <div class="form-group">
+        <input type="tel" id="aria-phone" aria-label="Mobile Number" placeholder="+1 (555) 000-0000">
+      </div>
+
+      <!-- ARIA-label: GitHub Profile -->
+      <div class="form-group">
+        <input type="url" id="aria-github" aria-label="GitHub Profile URL" placeholder="https://github.com/...">
+      </div>
+
+      <!-- ARIA-label: Portfolio URL -->
+      <div class="form-group">
+        <input type="url" id="aria-portfolio" aria-label="Personal Portfolio Link" placeholder="https://myportfolio.com">
+      </div>
+    </form>
+  </div>
+</body>
+</html>

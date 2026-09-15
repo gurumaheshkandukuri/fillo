@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "generate-icons": "node scripts/generate-icons.js",
-    "test": "node --experimental-strip-types scripts/test-profile.js && node --experimental-strip-types scripts/test-field-detector.js && node --experimental-strip-types scripts/test-field-mapping.js && node --experimental-strip-types scripts/test-autofill.js && node --experimental-strip-types scripts/test-m5.js",
+    "test": "node --experimental-strip-types scripts/test-profile.js && node --experimental-strip-types scripts/test-field-detector.js && node --experimental-strip-types scripts/test-field-mapping.js && node --experimental-strip-types scripts/test-autofill.js && node --experimental-strip-types scripts/test-m5.js && node --experimental-strip-types scripts/test-m6.js",
     "build": "node scripts/generate-icons.js && npm test && tsc --noEmit && vite build && node scripts/verify-extension.js",
     "dev": "vite build --watch",
     "verify": "node scripts/verify-extension.js"

@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FILLO Test — Framework-Like Controlled Form</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 30px 20px;
+    }
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+    .card {
+      background: #ffffff;
+      padding: 24px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      font-size: 18px;
+      margin-top: 0;
+      color: #1e293b;
+    }
+    .notice {
+      background: #fdf2f8;
+      border-left: 4px solid #db2777;
+      padding: 12px;
+      font-size: 13px;
+      color: #9d174d;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+    .form-group {
+      margin-bottom: 14px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #334155;
+    }
+    input {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 13px;
+      box-sizing: border-box;
+    }
+    .state-box {
+      background: #0f172a;
+      color: #f8fafc;
+      padding: 16px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      white-space: pre-wrap;
+      overflow-x: auto;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+    .badge-eligible {
+      background: #dcfce7;
+      color: #166534;
+    }
+    .badge-skip {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Form Side -->
+    <div class="card">
+      <h1>Framework-Like Form</h1>
+      <div class="notice">
+        Simulates React/Vue-controlled inputs listening to bubbling <code>input</code> &amp; <code>change</code> events.
+        Includes negative-context fields that FILLO must skip.
+      </div>
+
+      <form id="framework-form" onsubmit="event.preventDefault()">
+        <!-- Eligible Candidate Fields -->
+        <div class="form-group">
+          <label for="ctrl-name">Candidate Full Name <span class="badge badge-eligible">Eligible</span></label>
+          <input type="text" id="ctrl-name" data-model="candidateName" placeholder="Full name">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-email">Candidate Email Address <span class="badge badge-eligible">Eligible</span></label>
+          <input type="email" id="ctrl-email" data-model="candidateEmail" placeholder="you@example.com">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-phone">Primary Phone Number <span class="badge badge-eligible">Eligible</span></label>
+          <input type="tel" id="ctrl-phone" data-model="candidatePhone" placeholder="+1 555-0123">
+        </div>
+
+        <hr style="border: 0; border-top: 1px dashed #cbd5e1; margin: 20px 0;">
+
+        <!-- Context Safety / Negative Context Fields (MUST BE SKIPPED) -->
+        <div class="form-group">
+          <label for="ctrl-confirm-email">Confirm Email Address <span class="badge badge-skip">Must Skip</span></label>
+          <input type="email" id="ctrl-confirm-email" data-model="confirmEmail" placeholder="Repeat email">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-emergency-phone">Emergency Contact Phone <span class="badge badge-skip">Must Skip</span></label>
+          <input type="tel" id="ctrl-emergency-phone" data-model="emergencyPhone" placeholder="Emergency contact">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-recruiter-phone">Recruiter Contact Phone <span class="badge badge-skip">Must Skip</span></label>
+          <input type="tel" id="ctrl-recruiter-phone" data-model="recruiterPhone" placeholder="Recruiter's phone">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-referee-name">Reference / Referee Full Name <span class="badge badge-skip">Must Skip</span></label>
+          <input type="text" id="ctrl-referee-name" data-model="refereeName" placeholder="Reference full name">
+        </div>
+
+        <div class="form-group">
+          <label for="ctrl-company-name">Current Employer / Company Name <span class="badge badge-skip">Must Skip</span></label>
+          <input type="text" id="ctrl-company-name" data-model="companyName" placeholder="Company name">
+        </div>
+      </form>
+    </div>
+
+    <!-- Live Reactive State Side -->
+    <div class="card">
+      <h1>Observed Framework State</h1>
+      <p style="font-size: 13px; color: #64748b;">
+        Updated on bubbling <code>input</code> events received by the framework event loop:
+      </p>
+      <div id="state-display" class="state-box">{\n  // Awaiting events...\n}</div>
+    </div>
+  </div>
+
+  <script>
+    const state = {
+      candidateName: '',
+      candidateEmail: '',
+      candidatePhone: '',
+      confirmEmail: '',
+      emergencyPhone: '',
+      recruiterPhone: '',
+      refereeName: '',
+      companyName: ''
+    };
+
+    const display = document.getElementById('state-display');
+
+    function updateDisplay() {
+      display.textContent = JSON.stringify(state, null, 2);
+    }
+
+    document.querySelectorAll('input[data-model]').forEach((input) => {
+      const modelKey = input.getAttribute('data-model');
+      input.addEventListener('input', (e) => {
+        state[modelKey] = e.target.value;
+        updateDisplay();
+      });
+      input.addEventListener('change', (e) => {
+        state[modelKey] = e.target.value;
+        updateDisplay();
+      });
+    });
+
+    updateDisplay();
+  </script>
+</body>
+</html>

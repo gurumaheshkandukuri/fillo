@@ -90,6 +90,10 @@ export function writeSelectValue(
     return false;
   }
 
+  // Exact normalized string helper (handles whitespace, hyphen, and underscore differences)
+  const collapseDelimiters = (s: string) => s.toLowerCase().trim().replace(/[\s\-_]+/g, ' ');
+  const collapsedTarget = collapseDelimiters(normalizedTarget);
+
   const options = element.options;
   if (!options || options.length === 0) {
     return false;
@@ -97,20 +101,34 @@ export function writeSelectValue(
 
   let matchedIndex = -1;
 
+  // Pass 1: Strict exact match on text or value
   for (let i = 0; i < options.length; i++) {
     const opt = options[i];
     const optText = (opt.text || opt.textContent || '').trim().toLowerCase();
     const optValue = (opt.value || '').trim().toLowerCase();
 
-    // Check exact normalized match on either text or value
     if (optText === normalizedTarget || optValue === normalizedTarget) {
       matchedIndex = i;
       break;
     }
   }
 
+  // Pass 2: Exact match with collapsed whitespace/hyphen/underscore delimiters
   if (matchedIndex === -1) {
-    // No exact safe match found -> skip
+    for (let i = 0; i < options.length; i++) {
+      const opt = options[i];
+      const optText = collapseDelimiters(opt.text || opt.textContent || '');
+      const optValue = collapseDelimiters(opt.value || '');
+
+      if (optText === collapsedTarget || optValue === collapsedTarget) {
+        matchedIndex = i;
+        break;
+      }
+    }
+  }
+
+  if (matchedIndex === -1) {
+    // No safe exact or delimiter-normalized match found -> skip
     return false;
   }
 

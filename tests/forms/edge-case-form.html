@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FILLO Test — Edge Cases & Non-Native Controls</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background: #f8fafc;
+      color: #0f172a;
+      padding: 30px 20px;
+    }
+    .card {
+      max-width: 640px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 32px;
+      border-radius: 12px;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    }
+    h1 {
+      font-size: 20px;
+      margin-top: 0;
+      color: #1e293b;
+    }
+    .notice {
+      background: #f1f5f9;
+      border-left: 4px solid #64748b;
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #334155;
+      margin-bottom: 24px;
+      border-radius: 4px;
+    }
+    .form-group {
+      margin-bottom: 18px;
+    }
+    label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+      color: #334155;
+    }
+    input, select, textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .custom-combobox {
+      width: 100%;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #f8fafc;
+      cursor: pointer;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .contenteditable-box {
+      width: 100%;
+      min-height: 48px;
+      padding: 10px 14px;
+      border: 1px solid #cbd5e1;
+      border-radius: 6px;
+      background: #ffffff;
+      font-size: 14px;
+      box-sizing: border-box;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 4px;
+      margin-left: 6px;
+    }
+    .badge-skip {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+    .badge-supported {
+      background: #dcfce7;
+      color: #166534;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Edge Cases, Custom Controls &amp; Shadow DOM</h1>
+    <div class="notice">
+      <strong>M6 Test Fixture:</strong> Tests conservative safety boundaries: non-native custom dropdowns,
+      contenteditable elements, password fields, disabled/readonly fields, unsupported inputs, and open shadow DOM.
+    </div>
+
+    <form id="edge-case-form" onsubmit="event.preventDefault()">
+      <!-- 1. Password field (Must be skipped) -->
+      <div class="form-group">
+        <label for="f-password">Account Password <span class="badge badge-skip">Must Skip</span></label>
+        <input type="password" id="f-password" placeholder="••••••••">
+      </div>
+
+      <!-- 2. Disabled field (Must be skipped) -->
+      <div class="form-group">
+        <label for="f-disabled">Primary Email (Locked) <span class="badge badge-skip">Must Skip</span></label>
+        <input type="email" id="f-disabled" disabled value="locked@example.com">
+      </div>
+
+      <!-- 3. Readonly field (Must be skipped) -->
+      <div class="form-group">
+        <label for="f-readonly">Student ID / Location (System Assigned) <span class="badge badge-skip">Must Skip</span></label>
+        <input type="text" id="f-readonly" readonly value="New York, NY">
+      </div>
+
+      <!-- 4. Unsupported input type (color / date / file) (Must be skipped) -->
+      <div class="form-group">
+        <label for="f-color">Resume Accent Color <span class="badge badge-skip">Must Skip</span></label>
+        <input type="color" id="f-color" value="#2563eb">
+      </div>
+
+      <div class="form-group">
+        <label for="f-file">Upload Resume File <span class="badge badge-skip">Must Skip</span></label>
+        <input type="file" id="f-file">
+      </div>
+
+      <!-- 5. Custom Select / ARIA Combobox (Must be skipped safely) -->
+      <div class="form-group">
+        <label id="combo-label">Custom Degree Combobox <span class="badge badge-skip">Must Skip</span></label>
+        <div role="combobox" aria-labelledby="combo-label" aria-expanded="false" class="custom-combobox">
+          Select degree (Custom Div Dropdown)...
+        </div>
+      </div>
+
+      <!-- 6. Contenteditable Div (Must be skipped safely) -->
+      <div class="form-group">
+        <label>Skills / Cover Note (Rich Editor) <span class="badge badge-skip">Must Skip</span></label>
+        <div contenteditable="true" role="textbox" aria-label="Technical Skills" class="contenteditable-box"></div>
+      </div>
+
+      <!-- 7. Native select with hyphenated values (Must be safely supported) -->
+      <div class="form-group">
+        <label for="native-branch-select">Major / Branch <span class="badge badge-supported">Supported</span></label>
+        <select id="native-branch-select" name="branch_select">
+          <option value="">-- Choose Branch --</option>
+          <option value="computer-science">Computer Science &amp; Engineering</option>
+          <option value="information_technology">Information Technology</option>
+          <option value="mechanical-engineering">Mechanical Engineering</option>
+        </select>
+      </div>
+
+      <!-- 8. Open Shadow DOM element container -->
+      <div class="form-group">
+        <label>Web Component (Open Shadow DOM) <span class="badge badge-supported">Supported</span></label>
+        <div id="shadow-host"></div>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Create an open shadow root with an inspectable input
+    const host = document.getElementById('shadow-host');
+    if (host && host.attachShadow) {
+      const shadow = host.attachShadow({ mode: 'open' });
+      shadow.innerHTML = `
+        <style>
+          input {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 14px;
+            box-sizing: border-box;
+          }
+        </style>
+        <input type="text" id="shadow-fullname" aria-label="Candidate Full Name" placeholder="Inside Open Shadow DOM">
+      `;
+    }
+  </script>
+</body>
+</html>

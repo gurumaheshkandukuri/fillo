@@ -33,6 +33,7 @@ export class DynamicFormObserver {
       let containsCandidate = false;
 
       for (const mutation of mutations) {
+        // Handle added nodes
         if (mutation.addedNodes.length > 0) {
           for (let i = 0; i < mutation.addedNodes.length; i++) {
             const node = mutation.addedNodes[i];
@@ -51,6 +52,27 @@ export class DynamicFormObserver {
             }
           }
         }
+
+        // Handle removed nodes
+        if (mutation.removedNodes.length > 0) {
+          for (let i = 0; i < mutation.removedNodes.length; i++) {
+            const node = mutation.removedNodes[i];
+            if (node.nodeType === 1 /* Node.ELEMENT_NODE */) {
+              const el = node as HTMLElement;
+              const tag = el.tagName.toLowerCase();
+              if (
+                tag === 'input' ||
+                tag === 'textarea' ||
+                tag === 'select' ||
+                el.querySelector?.('input, textarea, select')
+              ) {
+                this.detector.pruneStaleFields();
+                break;
+              }
+            }
+          }
+        }
+
         if (containsCandidate) break;
       }
 

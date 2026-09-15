@@ -14,10 +14,57 @@ FILLO is a privacy-first Chrome browser extension designed to intelligently auto
 - [x] **Milestone 3B**: Deterministic field mapping heuristics & explainable confidence scoring.
 - [x] **Milestone 4**: Safe autofill engine & conservative safety gate.
 - [x] **Milestone 5**: Real-world form compatibility & user-triggered autofill UX.
+- [x] **Milestone 6**: Production hardening & real-world compatibility.
 
 ---
 
-## Milestone 5: Real-World Form Compatibility & Autofill UX
+## Milestone 6: Production Hardening & Real-World Compatibility
+
+Milestone 6 hardens FILLO for messy, real-world web applications while strictly preserving its conservative, privacy-first, and local-first architecture:
+
+1. **SPA Route Change Awareness**:
+   - Transparently intercepts `history.pushState` and `history.replaceState`, and listens to `popstate`.
+   - On route changes, invalidates stale/disconnected field references and rescans the new page view.
+   - **Zero Automatic Autofill**: Route transitions NEVER trigger automatic filling; filling requires explicit user click.
+
+2. **Stale DOM Reference Pruning**:
+   - Evaluates `element.isConnected`: removed or replaced form fields are automatically pruned from active field inventory.
+   - Prevents stale element references from lingering in memory or causing ghost fields in popup status summaries.
+
+3. **Open Shadow DOM Traversal**:
+   - Automatically traverses open Shadow DOM roots (`element.shadowRoot`) to discover web-component-encapsulated form controls.
+   - Closed Shadow DOM roots (`mode: 'closed'`) are intentionally inaccessible by browser security design and are documented as a limitation.
+
+4. **ARIA-Only & Autocomplete-Driven Forms**:
+   - Robustly extracts signals from `aria-label`, `aria-labelledby`, and standard HTML5 `autocomplete` tokens (`given-name`, `family-name`, `email`, `tel`, etc.) even when visible `<label>` tags are absent.
+   - Context safety overrides autocomplete when contradictory keywords (e.g. `confirm`, `emergency`, `recruiter`) are detected.
+
+5. **Framework-Controlled Inputs (React / Vue / Angular)**:
+   - Uses prototype property descriptor setters to ensure internal framework state trackers (such as React's `_valueTracker`) observe value assignments.
+   - Dispatches bubbling, cancelable `input` and `change` events.
+
+6. **Deterministic Select Normalization**:
+   - Normalizes option matching across whitespace, letter casing, hyphens, and underscores without fuzzy guessing or approximations.
+   - Safely skips unmatched options.
+
+7. **Conservative Refusal of Custom Controls & Contenteditable**:
+   - Safely skips non-native custom dropdowns (e.g. `<div role="combobox">`) and `<div contenteditable="true">` elements to preserve determinism.
+
+8. **Restricted Pages & Message Safety**:
+   - Gracefully degrades on internal or restricted browser URLs (`chrome://`, `chrome-extension://`, `devtools://`, `about:`) with `"FILLO isn't available on this page."`
+   - Content script strictly validates message schemas, rejects unknown message types, and loads profile data directly from storage (never accepts profile payloads from popup messages).
+
+9. **Zero-Leak Privacy Audit**:
+   - Strictly zero personal profile values are logged to console, passed through status queries, or emitted in popup summaries.
+
+---
+
+### Known Limitations
+
+1. **Closed Shadow DOM**: Elements inside closed shadow roots cannot be accessed via standard DOM APIs by browser security design.
+2. **Cross-Origin IFrames**: Iframes loaded from a different origin cannot be inspected or filled from the top-frame content script due to Same-Origin Policy.
+3. **Complex Non-Native Comboboxes**: Custom JavaScript-rendered dropdowns (e.g. custom `div`/`li` comboboxes without a native `<select>` or typed input) are skipped to avoid non-deterministic menu clicks.
+4. **Rich Text / Contenteditable**: Elements using `contenteditable="true"` are skipped for deterministic safety.
 
 Milestone 5 elevates FILLO into a controlled, reliable, and user-initiated extension experience on realistic web forms:
 
@@ -192,7 +239,7 @@ npm install
 ```
 
 ### 3. Run Behavioral Tests
-To verify all 129 automated behavioral tests across M2, M3A, M3B, M4, and M5:
+To verify all 174 automated behavioral tests across M2, M3A, M3B, M4, M5, and M6:
 ```bash
 npm test
 ```
@@ -227,6 +274,11 @@ npm run build
 
 ### 3. Test Real-World Forms
 Open each local test form in Google Chrome:
+- **ARIA-Only Form**: `file:///g:/Projects/Filloo/tests/forms/aria-only-form.html`
+- **Autocomplete-Only Form**: `file:///g:/Projects/Filloo/tests/forms/autocomplete-form.html`
+- **SPA Dynamic Route Form**: `file:///g:/Projects/Filloo/tests/forms/spa-dynamic-form.html`
+- **Framework-Like Form**: `file:///g:/Projects/Filloo/tests/forms/framework-like-form.html`
+- **Edge Cases & Shadow DOM**: `file:///g:/Projects/Filloo/tests/forms/edge-case-form.html`
 - **Basic Form**: `file:///g:/Projects/Filloo/tests/forms/basic-form.html`
 - **Job Application**: `file:///g:/Projects/Filloo/tests/forms/job-application.html`
 - **Scholarship Form**: `file:///g:/Projects/Filloo/tests/forms/scholarship-form.html`

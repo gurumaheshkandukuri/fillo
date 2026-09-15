@@ -181,6 +181,25 @@ function refreshActiveTabStatus() {
       return;
     }
 
+    const tabUrl = activeTab.url || '';
+    if (
+      tabUrl.startsWith('chrome://') ||
+      tabUrl.startsWith('chrome-extension://') ||
+      tabUrl.startsWith('devtools://') ||
+      tabUrl.startsWith('edge://') ||
+      tabUrl.startsWith('about:') ||
+      tabUrl.startsWith('view-source:')
+    ) {
+      updateAutofillUI({
+        detectedCount: 0,
+        eligibleCount: 0,
+        ready: false,
+        profileReady: Boolean(currentProfile),
+        message: "FILLO isn't available on this page.",
+      });
+      return;
+    }
+
     chrome.tabs.sendMessage(
       activeTab.id,
       { type: 'GET_AUTOFILL_STATUS' },
@@ -191,7 +210,7 @@ function refreshActiveTabStatus() {
             eligibleCount: 0,
             ready: false,
             profileReady: Boolean(currentProfile),
-            message: 'No supported form detected on this page.',
+            message: "FILLO isn't available on this page.",
           });
           return;
         }

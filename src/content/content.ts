@@ -28,7 +28,7 @@ let controller: AutofillController;
  */
 function logDetectedFields(
   fields: DetectedField[],
-  context: 'Initial scan' | 'Dynamic update'
+  context: 'Initial scan' | 'Dynamic update' | 'Route change'
 ): void {
   if (fields.length === 0) {
     console.log(`[FILLO] ${context}: No form fields found.`);
@@ -49,6 +49,52 @@ function logDetectedFields(
       ).toFixed(0)}%)`
     );
   });
+}
+
+/**
+ * Monitors SPA route changes via History API and popstate events.
+ * Safely invalidates stale field inventory and rescans the current page.
+ * Strictly avoids automatic autofill on route transitions.
+ */
+function setupRouteListener(onRouteChanged: () => void): void {
+  let routeDebounceTimer: ReturnType<typeof setTimeout> | null = null;
+
+  const triggerRouteChange = () => {
+    if (routeDebounceTimer) {
+      clearTimeout(routeDebounceTimer);
+    }
+    routeDebounceTimer = setTimeout(() => {
+      routeDebounceTimer = null;
+      onRouteChanged();
+    }, 200);
+  };
+
+  // 1. Intercept history.pushState
+  if (typeof window !== 'undefined' && window.history && typeof window.history.pushState === 'function') {
+    const originalPushState = window.history.pushState;
+    window.history.pushState = function (...args) {
+      const result = originalPushState.apply(this, args);
+      triggerRouteChange();
+      return result;
+    };
+  }
+
+  // 2. Intercept history.replaceState
+  if (typeof window !== 'undefined' && window.history && typeof window.history.replaceState === 'function') {
+    const originalReplaceState = window.history.replaceState;
+    window.history.replaceState = function (...args) {
+      const result = originalReplaceState.apply(this, args);
+      triggerRouteChange();
+      return result;
+    };
+  }
+
+  // 3. Listen to popstate (back/forward navigation)
+  if (typeof window !== 'undefined' && typeof window.addEventListener === 'function') {
+    window.addEventListener('popstate', () => {
+      triggerRouteChange();
+    });
+  }
 }
 
 /**
@@ -87,7 +133,14 @@ async function init(): Promise<void> {
     });
   }
 
-  // 3. Listen for profile updates from popup (e.g. user saves profile)
+  // 3. Setup SPA route change listener (prunes stale fields and rescans; never autofills)
+  setupRouteListener(() => {
+    detector.pruneStaleFields();
+    const currentFields = detector.scan();
+    logDetectedFields(currentFields, 'Route change');
+  });
+
+  // 4. Listen for profile updates from popup (e.g. user saves profile)
   if (typeof chrome !== 'undefined' && chrome.storage?.onChanged) {
     chrome.storage.onChanged.addListener((changes, areaName) => {
       if (areaName === 'local' && changes[STORAGE_KEY]) {
@@ -99,21 +152,32 @@ async function init(): Promise<void> {
     });
   }
 
-  // 4. Listen for user actions and status requests from popup
+  // 5. Listen for user actions and status requests from popup with strict type validation
   if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
-    chrome.runtime.onMessage.addListener((message: AutofillMessage, _sender, sendResponse) => {
-      if (message.type === 'GET_AUTOFILL_STATUS') {
+    chrome.runtime.onMessage.addListener((message: unknown, _sender, sendResponse) => {
+      if (!message || typeof message !== 'object' || !('type' in message)) {
+        sendResponse({ error: 'Invalid message payload' });
+        return false;
+      }
+
+      const typedMessage = message as AutofillMessage;
+
+      if (typedMessage.type === 'GET_AUTOFILL_STATUS') {
         const summary = controller.getStatus(currentProfile);
         sendResponse(summary);
         return false;
       }
 
-      if (message.type === 'EXECUTE_AUTOFILL') {
+      if (typedMessage.type === 'EXECUTE_AUTOFILL') {
+        // Crucial security guarantee: never accept profile data over messaging.
+        // Always use locally loaded currentProfile.
         const result = controller.executeAutofill(currentProfile);
         sendResponse(result);
         return false;
       }
 
+      // Reject unknown message types safely
+      sendResponse({ error: 'Unknown message type' });
       return false;
     });
   }
